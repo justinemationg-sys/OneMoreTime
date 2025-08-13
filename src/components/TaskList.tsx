@@ -38,9 +38,24 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, onUpdateTask, onDeleteTask, 
   const [showHelpModal, setShowHelpModal] = useState(false);
   const [showTimeEstimationModal, setShowTimeEstimationModal] = useState(false);
 
-  // Sorting state
-  const [sortBy, setSortBy] = useState<'deadline' | 'startDate' | 'createdAt'>('deadline');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  // Sorting state with localStorage persistence
+  const [sortBy, setSortBy] = useState<'deadline' | 'startDate' | 'createdAt'>(() => {
+    const saved = localStorage.getItem('timepilot-task-sort-by');
+    return (saved as 'deadline' | 'startDate' | 'createdAt') || 'deadline';
+  });
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>(() => {
+    const saved = localStorage.getItem('timepilot-task-sort-order');
+    return (saved as 'asc' | 'desc') || 'asc';
+  });
+
+  // Persist sorting preferences
+  React.useEffect(() => {
+    localStorage.setItem('timepilot-task-sort-by', sortBy);
+  }, [sortBy]);
+
+  React.useEffect(() => {
+    localStorage.setItem('timepilot-task-sort-order', sortOrder);
+  }, [sortOrder]);
 
   // Auto-detect deadline type based on whether deadline is set (similar to TaskInput)
   React.useEffect(() => {
