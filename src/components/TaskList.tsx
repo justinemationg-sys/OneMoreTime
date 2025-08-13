@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { BookOpen, Edit, Trash2, CheckCircle2, X, Info, ChevronDown, ChevronUp, HelpCircle } from 'lucide-react';
+import { BookOpen, Edit, Trash2, CheckCircle2, X, Info, ChevronDown, ChevronUp, HelpCircle, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import { Task, UserSettings } from '../types';
 import { formatTime, checkFrequencyDeadlineConflict } from '../utils/scheduling';
 
@@ -38,6 +38,25 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, onUpdateTask, onDeleteTask, 
   const [showHelpModal, setShowHelpModal] = useState(false);
   const [showTimeEstimationModal, setShowTimeEstimationModal] = useState(false);
 
+  // Sorting state with localStorage persistence
+  const [sortBy, setSortBy] = useState<'deadline' | 'startDate' | 'createdAt'>(() => {
+    const saved = localStorage.getItem('timepilot-task-sort-by');
+    return (saved as 'deadline' | 'startDate' | 'createdAt') || 'deadline';
+  });
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>(() => {
+    const saved = localStorage.getItem('timepilot-task-sort-order');
+    return (saved as 'asc' | 'desc') || 'asc';
+  });
+
+  // Persist sorting preferences
+  React.useEffect(() => {
+    localStorage.setItem('timepilot-task-sort-by', sortBy);
+  }, [sortBy]);
+
+  React.useEffect(() => {
+    localStorage.setItem('timepilot-task-sort-order', sortOrder);
+  }, [sortOrder]);
+
   // Auto-detect deadline type based on whether deadline is set (similar to TaskInput)
   React.useEffect(() => {
     if (editingTaskId) {
@@ -56,9 +75,38 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, onUpdateTask, onDeleteTask, 
   // Get today's date in YYYY-MM-DD format for min attribute
   const today = new Date().toISOString().split('T')[0];
 
-  // Separate active and completed tasks
-  const activeTasks = tasks.filter(task => task.status === 'pending');
-  const completedTasks = tasks.filter(task => task.status === 'completed');
+  // Sorting function
+  const sortTasks = (tasksToSort: Task[]) => {
+    return [...tasksToSort].sort((a, b) => {
+      let aValue: string | Date;
+      let bValue: string | Date;
+
+      switch (sortBy) {
+        case 'deadline':
+          // Tasks without deadline go to end when sorting ascending, beginning when descending
+          aValue = a.deadline ? new Date(a.deadline) : (sortOrder === 'asc' ? new Date('9999-12-31') : new Date('1970-01-01'));
+          bValue = b.deadline ? new Date(b.deadline) : (sortOrder === 'asc' ? new Date('9999-12-31') : new Date('1970-01-01'));
+          break;
+        case 'startDate':
+          aValue = a.startDate ? new Date(a.startDate) : new Date(a.createdAt);
+          bValue = b.startDate ? new Date(b.startDate) : new Date(b.createdAt);
+          break;
+        case 'createdAt':
+          aValue = new Date(a.createdAt);
+          bValue = new Date(b.createdAt);
+          break;
+        default:
+          return 0;
+      }
+
+      const comparison = aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+      return sortOrder === 'asc' ? comparison : -comparison;
+    });
+  };
+
+  // Separate active and completed tasks with sorting
+  const activeTasks = sortTasks(tasks.filter(task => task.status === 'pending'));
+  const completedTasks = sortTasks(tasks.filter(task => task.status === 'completed'));
 
   // Check if current edit form represents a low-priority urgent task
   const isLowPriorityUrgent = React.useMemo(() => {
@@ -353,12 +401,42 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, onUpdateTask, onDeleteTask, 
       
       {/* Active Tasks */}
       <div className="space-y-3">
-        <div className="flex items-center space-x-2 mb-2">
-          <BookOpen className="text-blue-600 dark:text-blue-400" size={20} />
-          <h2 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-white">Active Tasks</h2>
-          <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full dark:bg-blue-900 dark:text-blue-200">
-            {activeTasks.length}
-          </span>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
+          <div className="flex items-center space-x-2">
+            <BookOpen className="text-blue-600 dark:text-blue-400" size={20} />
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-white">Active Tasks</h2>
+            <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full dark:bg-blue-900 dark:text-blue-200">
+              {activeTasks.length}
+            </span>
+          </div>
+
+          {/* Sorting Controls */}
+          {activeTasks.length > 0 && (
+            <div className="flex items-center space-x-2">
+              <span className="text-sm text-gray-600 dark:text-gray-400">Sort by:</span>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as 'deadline' | 'startDate' | 'createdAt')}
+                className="text-sm border border-gray-300 rounded-lg px-2 py-1 bg-white dark:bg-gray-800 dark:text-white dark:border-gray-600 focus:ring-2 focus:ring-blue-500"
+                title="Choose how to sort tasks"
+              >
+                <option value="deadline">Deadline</option>
+                <option value="startDate">Start Date</option>
+                <option value="createdAt">Date Created</option>
+              </select>
+              <button
+                onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+                className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors border border-transparent hover:border-gray-300 dark:hover:border-gray-600"
+                title={`Currently sorting ${sortOrder === 'asc' ? 'earliest to latest' : 'latest to earliest'}. Click to reverse order.`}
+              >
+                {sortOrder === 'asc' ? (
+                  <ArrowUp size={16} className="text-gray-600 dark:text-gray-400" />
+                ) : (
+                  <ArrowDown size={16} className="text-gray-600 dark:text-gray-400" />
+                )}
+              </button>
+            </div>
+          )}
         </div>
 
         {activeTasks.length === 0 ? (
@@ -376,48 +454,22 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, onUpdateTask, onDeleteTask, 
               >
               {editingTaskId === task.id ? (
                   <div className="space-y-4">
-                    {/* Task Title & Category Row */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-1">Task Title <span className="text-red-500">*</span></label>
-                        <input
-                          type="text"
-                          required
-                          value={editFormData.title || ''}
-                          onChange={(e) => setEditFormData({ ...editFormData, title: e.target.value })}
-                          className="w-full px-4 py-3 backdrop-blur-sm bg-white/70 dark:bg-black/20 border border-white/30 dark:border-white/20 rounded-xl text-base focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:text-white transition-all duration-300"
-                          placeholder="e.g., Write project report"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Category <span className="text-gray-400">(Optional)</span></label>
-                        <select
-                          value={editFormData.category || ''}
-                          onChange={(e) => setEditFormData({ ...editFormData, category: e.target.value, customCategory: '' })}
-                          className="w-full border rounded-lg px-3 py-2 text-base bg-white dark:bg-gray-800 dark:text-white"
-                        >
-                          <option value="">Select category...</option>
-                          {['Academics', 'Organization', 'Work', 'Personal', 'Health', 'Learning', 'Finance', 'Home', 'Custom...'].map(opt => (
-                            <option key={opt} value={opt}>{opt}</option>
-                          ))}
-                        </select>
-                        {editFormData.category === 'Custom...' && (
-                          <input
-                            type="text"
-                            value={editFormData.customCategory || ''}
-                            onChange={(e) => setEditFormData({ ...editFormData, customCategory: e.target.value })}
-                            className="w-full border rounded-lg px-3 py-2 mt-2 text-base bg-white dark:bg-gray-800 dark:text-white"
-                            placeholder="Enter custom category"
-                          />
-                        )}
-                      </div>
+                    {/* 1. Task Title */}
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-1">Task Title <span className="text-red-500">*</span></label>
+                      <input
+                        type="text"
+                        required
+                        value={editFormData.title || ''}
+                        onChange={(e) => setEditFormData({ ...editFormData, title: e.target.value })}
+                        className="w-full px-4 py-3 backdrop-blur-sm bg-white/70 dark:bg-black/20 border border-white/30 dark:border-white/20 rounded-xl text-base focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:text-white transition-all duration-300"
+                        placeholder="e.g., Write project report"
+                      />
                     </div>
 
-                    {/* Description */}
+                    {/* 2. Description */}
                     <div>
-
-                      <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-1">Description <span className="text-gray-400">(Optional)</span></label>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Description <span className="text-gray-400">(Optional)</span></label>
                       <textarea
                         value={editFormData.description || ''}
                         onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
@@ -426,7 +478,135 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, onUpdateTask, onDeleteTask, 
                       />
                     </div>
 
-                    {/* Time Estimation - Dual Mode Interface */}
+                    {/* 3. Category */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Category <span className="text-gray-400">(Optional)</span></label>
+                      <select
+                        value={editFormData.category || ''}
+                        onChange={(e) => setEditFormData({ ...editFormData, category: e.target.value, customCategory: '' })}
+                        className="w-full border rounded-lg px-3 py-2 text-base bg-white dark:bg-gray-800 dark:text-white"
+                      >
+                        <option value="">Select category...</option>
+                        {['Academics', 'Organization', 'Work', 'Personal', 'Health', 'Learning', 'Finance', 'Home', 'Custom...'].map(opt => (
+                          <option key={opt} value={opt}>{opt}</option>
+                        ))}
+                      </select>
+                      {editFormData.category === 'Custom...' && (
+                        <input
+                          type="text"
+                          value={editFormData.customCategory || ''}
+                          onChange={(e) => setEditFormData({ ...editFormData, customCategory: e.target.value })}
+                          className="w-full border rounded-lg px-3 py-2 mt-2 text-base bg-white dark:bg-gray-800 dark:text-white"
+                          placeholder="Enter custom category"
+                        />
+                      )}
+                    </div>
+
+                    {/* 4. Deadline (with Start Date to the right) */}
+                    <div className="space-y-3">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-1">Deadline <span className="text-gray-400">(Optional)</span></label>
+                          <input
+                            type="date"
+                            min={today}
+                            value={editFormData.deadline || ''}
+                            onChange={(e) => setEditFormData({ ...editFormData, deadline: e.target.value })}
+                            className="w-full px-3 py-2 border rounded-lg text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent border-gray-300 bg-white dark:bg-gray-800 dark:text-white"
+                            placeholder="Select deadline (optional)"
+                          />
+                          {isDeadlinePast && editFormData.deadline && (
+                            <div className="text-red-600 text-xs mt-1">Deadline cannot be in the past.</div>
+                          )}
+                        </div>
+
+                        {!editFormData.isOneTimeTask && (
+                          <div>
+                            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-1">Start Date</label>
+                            <input
+                              type="date"
+                              min={today}
+                              value={editFormData.startDate || ''}
+                              onChange={(e) => setEditFormData({ ...editFormData, startDate: e.target.value || today })}
+                              className={`w-full px-3 py-2 border rounded-lg text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent border-gray-300 bg-white dark:bg-gray-800 dark:text-white ${!isStartDateNotPast && editFormData.startDate ? 'border-red-500 focus:ring-red-500' : ''}`}
+                            />
+                            {!isStartDateNotPast && editFormData.startDate && (
+                              <div className="text-red-600 text-xs mt-1">Start date cannot be in the past.</div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">Leave deadline empty for flexible tasks, or set a deadline for time-sensitive work</div>
+                    </div>
+
+                    {/* 5. One sitting toggle */}
+                    <div>
+                      <label className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={editFormData.isOneTimeTask || false}
+                          onChange={(e) => setEditFormData({ ...editFormData, isOneTimeTask: e.target.checked })}
+                          className="text-blue-600"
+                        />
+                        <span className="text-sm text-gray-700 dark:text-gray-200">Complete this task in one sitting (don't divide into sessions)</span>
+                      </label>
+                      <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">Check this for short tasks or tasks that need to be done all at once</div>
+                      {editFormData.isOneTimeTask && (
+                        <div className="mt-1 p-2 bg-blue-50 dark:bg-blue-900/20 rounded border-l-2 border-blue-300 dark:border-blue-600">
+                          <div className="text-xs text-blue-700 dark:text-blue-300">
+                             One-sitting tasks will be scheduled as single blocks. Work frequency settings won't apply.
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* 6. Frequency */}
+                    {!editFormData.isOneTimeTask && (
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">
+                          How often would you like to work on this?
+                        </label>
+                        <select
+                          value={editFormData.targetFrequency || 'daily'}
+                          onChange={(e) => setEditFormData({ ...editFormData, targetFrequency: e.target.value as any })}
+                          className="w-full px-3 py-2 border rounded-lg text-base bg-white dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        >
+                          <option value="daily">🗓️ Daily progress - Work a bit each day</option>
+                          <option
+                            value="3x-week"
+                            disabled={frequencyRestrictions.disable3xWeek}
+                          >
+                            📅 Few times per week - Every 2-3 days{frequencyRestrictions.disable3xWeek ? ' (Need 1+ week)' : ''}
+                          </option>
+                          <option
+                            value="weekly"
+                            disabled={frequencyRestrictions.disableWeekly}
+                          >
+                            📆 Weekly sessions - Once per week{frequencyRestrictions.disableWeekly ? ' (Need 2+ weeks)' : ''}
+                          </option>
+                          <option value="flexible">⏰ When I have time - Flexible scheduling</option>
+                        </select>
+
+                        {deadlineConflict.hasConflict && (
+                          <div className="mt-2 p-2 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 rounded text-xs text-amber-700 dark:text-amber-200">
+                            <div className="flex items-start gap-1">
+                              <span className="text-amber-600 dark:text-amber-400">⚠️</span>
+                              <div>
+                                <div className="font-medium">Frequency preference may not allow completion before deadline</div>
+                                <div className="mt-1">{deadlineConflict.reason}</div>
+                                {deadlineConflict.recommendedFrequency && (
+                                  <div className="mt-1">
+                                    <strong>Recommended:</strong> Switch to "{deadlineConflict.recommendedFrequency}" frequency, or daily scheduling will be used instead.
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* 7. Time Estimation - Dual Mode Interface */}
                     <div>
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
@@ -553,112 +733,7 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, onUpdateTask, onDeleteTask, 
                       )}
                     </div>
 
-                    {/* Deadline & Start Date - Side by Side */}
-                    <div className="space-y-3">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        <div>
-                          <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-1">Deadline <span className="text-gray-400">(Optional)</span></label>
-                          <input
-                            type="date"
-                            min={today}
-                            value={editFormData.deadline || ''}
-                            onChange={(e) => setEditFormData({ ...editFormData, deadline: e.target.value })}
-                            className="w-full px-3 py-2 border rounded-lg text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent border-gray-300 bg-white dark:bg-gray-800 dark:text-white"
-                            placeholder="Select deadline (optional)"
-                          />
-                          {isDeadlinePast && editFormData.deadline && (
-                            <div className="text-red-600 text-xs mt-1">Deadline cannot be in the past.</div>
-                          )}
-                        </div>
-
-                        {!editFormData.isOneTimeTask && (
-                          <div>
-                            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-1">Start Date</label>
-                            <input
-                              type="date"
-                              min={today}
-                              value={editFormData.startDate || ''}
-                              onChange={(e) => setEditFormData({ ...editFormData, startDate: e.target.value || today })}
-                              className={`w-full px-3 py-2 border rounded-lg text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent border-gray-300 bg-white dark:bg-gray-800 dark:text-white ${!isStartDateNotPast && editFormData.startDate ? 'border-red-500 focus:ring-red-500' : ''}`}
-                            />
-                            {!isStartDateNotPast && editFormData.startDate && (
-                              <div className="text-red-600 text-xs mt-1">Start date cannot be in the past.</div>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400">Leave deadline empty for flexible tasks, or set a deadline for time-sensitive work</div>
-
-                      {/* One-time task option */}
-                      <div className="mt-3">
-                        <label className="flex items-center gap-2">
-                          <input
-                            type="checkbox"
-                            checked={editFormData.isOneTimeTask || false}
-                            onChange={(e) => setEditFormData({ ...editFormData, isOneTimeTask: e.target.checked })}
-                            className="text-blue-600"
-                          />
-                          <span className="text-sm text-gray-700 dark:text-gray-200">Complete this task in one sitting (don't divide into sessions)</span>
-                        </label>
-                        <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">Check this for short tasks or tasks that need to be done all at once</div>
-                        {editFormData.isOneTimeTask && (
-                          <div className="mt-1 p-2 bg-blue-50 dark:bg-blue-900/20 rounded border-l-2 border-blue-300 dark:border-blue-600">
-                            <div className="text-xs text-blue-700 dark:text-blue-300">
-                               One-sitting tasks will be scheduled as single blocks. Work frequency settings won't apply.
-                            </div>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Work Frequency Preference - Dropdown */}
-                      {!editFormData.isOneTimeTask && (
-                        <div className="mt-4">
-                          <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">
-                            How often would you like to work on this?
-                          </label>
-                          <select
-                            value={editFormData.targetFrequency || 'daily'}
-                            onChange={(e) => setEditFormData({ ...editFormData, targetFrequency: e.target.value as any })}
-                            className="w-full px-3 py-2 border rounded-lg text-base bg-white dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          >
-                            <option value="daily"> Daily progress - Work a bit each day</option>
-                            <option
-                              value="3x-week"
-                              disabled={frequencyRestrictions.disable3xWeek}
-                            >
-                               Few times per week - Every 2-3 days{frequencyRestrictions.disable3xWeek ? ' (Need 1+ week)' : ''}
-                            </option>
-                            <option
-                              value="weekly"
-                              disabled={frequencyRestrictions.disableWeekly}
-                            >
-                               Weekly sessions - Once per week{frequencyRestrictions.disableWeekly ? ' (Need 2+ weeks)' : ''}
-                            </option>
-                            <option value="flexible"> When I have time - Flexible scheduling</option>
-                          </select>
-
-                          {/* Show warning if frequency conflicts with deadline */}
-                          {deadlineConflict.hasConflict && (
-                            <div className="mt-2 p-2 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 rounded text-xs text-amber-700 dark:text-amber-200">
-                              <div className="flex items-start gap-1">
-                                <span className="text-amber-600 dark:text-amber-400"></span>
-                                <div>
-                                  <div className="font-medium">Frequency preference may not allow completion before deadline</div>
-                                  <div className="mt-1">{deadlineConflict.reason}</div>
-                                  {deadlineConflict.recommendedFrequency && (
-                                    <div className="mt-1">
-                                      <strong>Recommended:</strong> Switch to "{deadlineConflict.recommendedFrequency}" frequency, or daily scheduling will be used instead.
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Impact */}
+                    {/* 8. Task Importance */}
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-1">How much will this impact your goals? <span className="text-red-500">*</span></label>
                       <div className="flex flex-col md:flex-row gap-4 mt-2">
@@ -963,20 +1038,50 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, onUpdateTask, onDeleteTask, 
       {/* Completed Tasks */}
       {completedTasks.length > 0 && (
         <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-            <CheckCircle2 className="text-green-600 dark:text-green-400" size={20} />
-              <h2 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-white">Completed Tasks</h2>
-              <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full dark:bg-green-900 dark:text-green-200">
-                {completedTasks.length}
-              </span>
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <CheckCircle2 className="text-green-600 dark:text-green-400" size={20} />
+                <h2 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-white">Completed Tasks</h2>
+                <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full dark:bg-green-900 dark:text-green-200">
+                  {completedTasks.length}
+                </span>
+              </div>
+              <button
+                onClick={() => setShowCompletedTasks(!showCompletedTasks)}
+                className="text-sm text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
+              >
+                {showCompletedTasks ? 'Hide' : 'Show'} Completed
+              </button>
             </div>
-            <button
-              onClick={() => setShowCompletedTasks(!showCompletedTasks)}
-              className="text-sm text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
-            >
-              {showCompletedTasks ? 'Hide' : 'Show'} Completed
-            </button>
+
+            {/* Sorting Controls for Completed Tasks */}
+            {showCompletedTasks && completedTasks.length > 0 && (
+              <div className="flex items-center space-x-2 ml-7">
+                <span className="text-sm text-gray-600 dark:text-gray-400">Sort by:</span>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as 'deadline' | 'startDate' | 'createdAt')}
+                  className="text-sm border border-gray-300 rounded-lg px-2 py-1 bg-white dark:bg-gray-800 dark:text-white dark:border-gray-600 focus:ring-2 focus:ring-blue-500"
+                  title="Choose how to sort completed tasks"
+                >
+                  <option value="deadline">Deadline</option>
+                  <option value="startDate">Start Date</option>
+                  <option value="createdAt">Date Created</option>
+                </select>
+                <button
+                  onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+                  className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors border border-transparent hover:border-gray-300 dark:hover:border-gray-600"
+                  title={`Currently sorting ${sortOrder === 'asc' ? 'earliest to latest' : 'latest to earliest'}. Click to reverse order.`}
+                >
+                  {sortOrder === 'asc' ? (
+                    <ArrowUp size={16} className="text-gray-600 dark:text-gray-400" />
+                  ) : (
+                    <ArrowDown size={16} className="text-gray-600 dark:text-gray-400" />
+                  )}
+                </button>
+              </div>
+            )}
           </div>
 
           {showCompletedTasks && (

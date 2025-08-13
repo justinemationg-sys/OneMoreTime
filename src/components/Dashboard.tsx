@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { Clock, BookOpen, TrendingUp, Calendar, Bell, CheckCircle2, AlertTriangle, Clock3, X } from 'lucide-react';
 import { Task, StudyPlan } from '../types';
 import { formatTime, getLocalDateString, checkSessionStatus } from '../utils/scheduling';
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
+import { SafePieChart } from './SafeRecharts';
+import { ChartErrorBoundary } from './ChartErrorBoundary';
 
 interface DashboardProps {
   tasks: Task[];
@@ -298,47 +299,21 @@ const Dashboard: React.FC<DashboardProps> = ({ tasks, studyPlans, dailyAvailable
             {/* Task Completion Circle Chart */}
             <div className="flex flex-col items-center">
               <h3 className="text-lg font-medium text-gray-700 mb-4 dark:text-gray-300">Task Completion</h3>
-              <div className="relative w-32 h-32">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={[
-                        { name: 'Completed', value: completedTasks.length, color: '#10b981' },
-                        { name: 'Pending', value: tasks.length - completedTasks.length, color: '#e5e7eb' }
-                      ]}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={35}
-                      outerRadius={60}
-                      paddingAngle={2}
-                      dataKey="value"
-                    >
-                      {[
-                        { name: 'Completed', value: completedTasks.length, color: '#10b981' },
-                        { name: 'Pending', value: tasks.length - completedTasks.length, color: '#e5e7eb' }
-                      ].map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip 
-                      formatter={(value, name) => [value, name]}
-                      contentStyle={{ 
-                        backgroundColor: '#1f2937', 
-                        border: 'none', 
-                        borderRadius: '8px',
-                        color: '#f9fafb'
-                      }}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-gray-800 dark:text-white">
-                      {tasks.length > 0 ? Math.round((completedTasks.length / tasks.length) * 100) : 0}%
+              <ChartErrorBoundary>
+                <SafePieChart
+                  data={[
+                    { name: 'Completed', value: completedTasks.length, color: '#10b981' },
+                    { name: 'Pending', value: tasks.length - completedTasks.length, color: '#e5e7eb' }
+                  ]}
+                  centerContent={
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-gray-800 dark:text-white">
+                        {tasks.length > 0 ? Math.round((completedTasks.length / tasks.length) * 100) : 0}%
+                      </div>
                     </div>
-                  </div>
-                </div>
-              </div>
+                  }
+                />
+              </ChartErrorBoundary>
               <div className="mt-2 text-center">
                 <div className="text-sm text-gray-600 dark:text-gray-400">
                   {completedTasks.length}/{tasks.length}
@@ -359,47 +334,22 @@ const Dashboard: React.FC<DashboardProps> = ({ tasks, studyPlans, dailyAvailable
             {/* Study Hours Progress Circle Chart */}
             <div className="flex flex-col items-center">
               <h3 className="text-lg font-medium text-gray-700 mb-4 dark:text-gray-300">Study Hours Progress</h3>
-              <div className="relative w-32 h-32">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={[
-                        { name: 'Completed', value: completedHours, color: '#8b5cf6' },
-                        { name: 'Remaining', value: Math.max(0, totalOriginalEstimatedHours - completedHours), color: '#e5e7eb' }
-                      ]}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={35}
-                      outerRadius={60}
-                      paddingAngle={2}
-                      dataKey="value"
-                    >
-                      {[
-                        { name: 'Completed', value: completedHours, color: '#8b5cf6' },
-                        { name: 'Remaining', value: Math.max(0, totalOriginalEstimatedHours - completedHours), color: '#e5e7eb' }
-                      ].map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip 
-                      formatter={(value, name) => [typeof value === 'number' ? formatTime(value) : value, name]}
-                      contentStyle={{ 
-                        backgroundColor: '#1f2937', 
-                        border: 'none', 
-                        borderRadius: '8px',
-                        color: '#f9fafb'
-                      }}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-gray-800 dark:text-white">
-                      {totalOriginalEstimatedHours > 0 ? Math.round((completedHours / totalOriginalEstimatedHours) * 100) : 0}%
+              <ChartErrorBoundary>
+                <SafePieChart
+                  data={[
+                    { name: 'Completed', value: completedHours, color: '#8b5cf6' },
+                    { name: 'Remaining', value: Math.max(0, totalOriginalEstimatedHours - completedHours), color: '#e5e7eb' }
+                  ]}
+                  centerContent={
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-gray-800 dark:text-white">
+                        {totalOriginalEstimatedHours > 0 ? Math.round((completedHours / totalOriginalEstimatedHours) * 100) : 0}%
+                      </div>
                     </div>
-                  </div>
-                </div>
-              </div>
+                  }
+                  tooltipFormatter={(value, name) => [typeof value === 'number' ? formatTime(value) : value, name]}
+                />
+              </ChartErrorBoundary>
               <div className="mt-2 text-center">
                 <div className="text-sm text-gray-600 dark:text-gray-400">
                   {(() => {
