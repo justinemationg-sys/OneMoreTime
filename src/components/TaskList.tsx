@@ -963,6 +963,11 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, onUpdateTask, onDeleteTask, 
                             Important
                           </span>
                         )}
+                        {task.category === 'Routine' && (
+                            <span className="text-xs bg-indigo-100 text-indigo-800 px-2 py-1 rounded-full dark:bg-indigo-900 dark:text-indigo-200 flex-shrink-0">
+                            Routine
+                          </span>
+                        )}
                         </div>
                         
                         <div className="space-y-2">
