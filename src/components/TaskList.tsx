@@ -68,8 +68,9 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, onUpdateTask, onDeleteTask, 
 
       switch (sortBy) {
         case 'deadline':
-          aValue = a.deadline ? new Date(a.deadline) : new Date('9999-12-31'); // Tasks without deadline go to end
-          bValue = b.deadline ? new Date(b.deadline) : new Date('9999-12-31');
+          // Tasks without deadline go to end when sorting ascending, beginning when descending
+          aValue = a.deadline ? new Date(a.deadline) : (sortOrder === 'asc' ? new Date('9999-12-31') : new Date('1970-01-01'));
+          bValue = b.deadline ? new Date(b.deadline) : (sortOrder === 'asc' ? new Date('9999-12-31') : new Date('1970-01-01'));
           break;
         case 'startDate':
           aValue = a.startDate ? new Date(a.startDate) : new Date(a.createdAt);
