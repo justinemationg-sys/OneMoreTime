@@ -5,5 +5,7 @@ import './index.css';
 import './pwa';
 
 createRoot(document.getElementById('root')!).render(
-  <App />
+  <StrictMode>
+    <App />
+  </StrictMode>
 );
