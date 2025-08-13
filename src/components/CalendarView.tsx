@@ -1454,7 +1454,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({
                   <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Task Category Colors</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* All default categories */}
-                    {['Academics', 'Personal', 'Learning', 'Home', 'Finance', 'Organization', 'Work', 'Health'].map(category => {
+                    {['Academics', 'Personal', 'Learning', 'Home', 'Finance', 'Organization', 'Work', 'Health', 'Routine'].map(category => {
                       let defaultColor = '#64748b';
                       switch (category.toLowerCase()) {
                         case 'academics':
