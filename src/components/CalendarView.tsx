@@ -1483,10 +1483,11 @@ const CalendarView: React.FC<CalendarViewProps> = ({
                             type="color"
                             value={categoryColorMap[category] || defaultColor}
                             onChange={(e) => {
-                              // Update the category color map
-                              const newColorMap = { ...categoryColorMap };
-                              newColorMap[category] = e.target.value;
-                              // Note: This would need to be persisted if you want to save custom colors
+                              // Update the category colors state which will persist and trigger re-render
+                              setCategoryColors(prev => ({
+                                ...prev,
+                                [category]: e.target.value
+                              }));
                             }}
                             className="w-12 h-8 rounded border border-gray-300 dark:border-gray-600"
                           />
