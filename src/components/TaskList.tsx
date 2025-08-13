@@ -60,9 +60,37 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, onUpdateTask, onDeleteTask, 
   // Get today's date in YYYY-MM-DD format for min attribute
   const today = new Date().toISOString().split('T')[0];
 
-  // Separate active and completed tasks
-  const activeTasks = tasks.filter(task => task.status === 'pending');
-  const completedTasks = tasks.filter(task => task.status === 'completed');
+  // Sorting function
+  const sortTasks = (tasksToSort: Task[]) => {
+    return [...tasksToSort].sort((a, b) => {
+      let aValue: string | Date;
+      let bValue: string | Date;
+
+      switch (sortBy) {
+        case 'deadline':
+          aValue = a.deadline ? new Date(a.deadline) : new Date('9999-12-31'); // Tasks without deadline go to end
+          bValue = b.deadline ? new Date(b.deadline) : new Date('9999-12-31');
+          break;
+        case 'startDate':
+          aValue = a.startDate ? new Date(a.startDate) : new Date(a.createdAt);
+          bValue = b.startDate ? new Date(b.startDate) : new Date(b.createdAt);
+          break;
+        case 'createdAt':
+          aValue = new Date(a.createdAt);
+          bValue = new Date(b.createdAt);
+          break;
+        default:
+          return 0;
+      }
+
+      const comparison = aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+      return sortOrder === 'asc' ? comparison : -comparison;
+    });
+  };
+
+  // Separate active and completed tasks with sorting
+  const activeTasks = sortTasks(tasks.filter(task => task.status === 'pending'));
+  const completedTasks = sortTasks(tasks.filter(task => task.status === 'completed'));
 
   // Check if current edit form represents a low-priority urgent task
   const isLowPriorityUrgent = React.useMemo(() => {
