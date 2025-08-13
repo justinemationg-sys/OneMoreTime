@@ -1,15 +1,5 @@
-import React, { useState, useEffect, useMemo } from 'react';
-
-// Lazy load recharts to avoid SSR/hydration issues
-const LazyRecharts = React.lazy(() => import('recharts').then(module => ({
-  default: {
-    PieChart: module.PieChart,
-    Pie: module.Pie,
-    Cell: module.Cell,
-    ResponsiveContainer: module.ResponsiveContainer,
-    Tooltip: module.Tooltip
-  }
-})));
+import React, { useState, useEffect, useRef } from 'react';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 
 interface SafePieChartProps {
   data: Array<{ name: string; value: number; color: string }>;
