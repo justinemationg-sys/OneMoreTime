@@ -932,7 +932,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({
         } else if (categoryLower.includes('work') || categoryLower.includes('job') || categoryLower.includes('business')) {
           return '💼';
         } else if (categoryLower.includes('health') || categoryLower.includes('medical') || categoryLower.includes('fitness')) {
-          return '🏥';
+          return '��';
         } else if (categoryLower.includes('finance') || categoryLower.includes('money') || categoryLower.includes('budget')) {
           return '💰';
         } else if (categoryLower.includes('home') || categoryLower.includes('house') || categoryLower.includes('family')) {
@@ -1135,7 +1135,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({
         </div>
         ))}
         {/* Default Category Legends (for categories not yet used) */}
-        {['Academics', 'Personal', 'Learning', 'Home', 'Finance', 'Organization', 'Work', 'Health'].filter(category => !taskCategories.includes(category)).map(category => {
+        {['Academics', 'Personal', 'Learning', 'Home', 'Finance', 'Organization', 'Work', 'Health', 'Routine'].filter(category => !taskCategories.includes(category)).map(category => {
           let color = '#64748b'; // Default gray
           switch (category.toLowerCase()) {
             case 'academics':
