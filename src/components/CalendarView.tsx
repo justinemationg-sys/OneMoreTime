@@ -475,6 +475,9 @@ const CalendarView: React.FC<CalendarViewProps> = ({
         case 'health':
           categoryColorMap[category] = '#ef4444'; // Red
           break;
+        case 'routine':
+          categoryColorMap[category] = '#6366f1'; // Indigo
+          break;
         default:
           categoryColorMap[category] = '#64748b'; // Default gray
       }
