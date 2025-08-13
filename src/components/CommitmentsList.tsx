@@ -223,11 +223,6 @@ const CommitmentsList: React.FC<CommitmentsListProps> = ({
                     >
                       {commitment.category}
                     </span>
-                    {commitment.category === 'Routine' && (
-                      <span className="px-2 py-1 text-xs font-medium rounded-full bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-200 flex-shrink-0">
-                        Routine
-                      </span>
-                    )}
                   </div>
                   <div className="space-y-2">
                     {commitment.isAllDay ? (
