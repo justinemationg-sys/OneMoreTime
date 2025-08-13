@@ -18,6 +18,7 @@ const CATEGORIES = [
   'Finance',
   'Home',
   'Organization',
+  'Routine',
   'Buffer',
 ];
 
@@ -41,6 +42,8 @@ const getCategoryColor = (category: string) => {
       return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
     case 'Buffer':
       return 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300';
+    case 'Routine':
+      return 'bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-300';
     default:
       return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
   }
@@ -220,6 +223,11 @@ const CommitmentsList: React.FC<CommitmentsListProps> = ({
                     >
                       {commitment.category}
                     </span>
+                    {commitment.category === 'Routine' && (
+                      <span className="px-2 py-1 text-xs font-medium rounded-full bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-200 flex-shrink-0">
+                        Routine
+                      </span>
+                    )}
                   </div>
                   <div className="space-y-2">
                     {commitment.isAllDay ? (
