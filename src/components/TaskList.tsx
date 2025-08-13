@@ -300,7 +300,7 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, onUpdateTask, onDeleteTask, 
       estimatedMinutes: minutes,
       subject: task.subject,
       category: task.category === 'Custom...' ? '' : task.category,
-      customCategory: task.category && !['Academics', 'Organization', 'Work', 'Personal', 'Health', 'Learning', 'Finance', 'Home'].includes(task.category) ? task.category : '',
+      customCategory: task.category && !['Academics', 'Organization', 'Work', 'Personal', 'Health', 'Learning', 'Finance', 'Home', 'Routine'].includes(task.category) ? task.category : '',
       impact: task.impact || (task.importance ? 'high' : 'low'),
       deadlineType: task.deadlineType || (task.deadline ? 'hard' : 'none'),
       schedulingPreference: task.schedulingPreference || 'consistent',
@@ -487,7 +487,7 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, onUpdateTask, onDeleteTask, 
                         className="w-full border rounded-lg px-3 py-2 text-base bg-white dark:bg-gray-800 dark:text-white"
                       >
                         <option value="">Select category...</option>
-                        {['Academics', 'Organization', 'Work', 'Personal', 'Health', 'Learning', 'Finance', 'Home', 'Custom...'].map(opt => (
+                        {['Academics', 'Organization', 'Work', 'Personal', 'Health', 'Learning', 'Finance', 'Home', 'Routine', 'Custom...'].map(opt => (
                           <option key={opt} value={opt}>{opt}</option>
                         ))}
                       </select>

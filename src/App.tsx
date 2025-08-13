@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Calendar, CheckSquare, Clock, Settings as SettingsIcon, BarChart3, CalendarDays, Lightbulb, Edit, Trash2, Menu, X, HelpCircle, Trophy, User } from 'lucide-react';
 import { Task, StudyPlan, UserSettings, FixedCommitment, StudySession, TimerState } from './types';
 import { GamificationData, Achievement, DailyChallenge, MotivationalMessage } from './types-gamification';
@@ -36,6 +36,103 @@ import './utils/test-data-setup'; // Import test data setup for testing
 import { assessAddTaskFeasibility } from './utils/task-feasibility';
 
 function App() {
+    // State initialization first
+    const [activeTab, setActiveTab] = useState<'dashboard' | 'tasks' | 'plan' | 'timer' | 'calendar' | 'commitments' | 'settings'>('dashboard');
+    const [tasks, setTasks] = useState<Task[]>([]);
+    const [studyPlans, setStudyPlans] = useState<StudyPlan[]>([]);
+    const [currentTask, setCurrentTask] = useState<Task | null>(null);
+    const [currentSession, setCurrentSession] = useState<{ allocatedHours: number; planDate?: string; sessionNumber?: number } | null>(null);
+    const [fixedCommitments, setFixedCommitments] = useState<FixedCommitment[]>([]);
+    const [settings, setSettings] = useState<UserSettings>({
+        dailyAvailableHours: 6,
+        workDays: [0, 1, 2, 3, 4, 5, 6],
+        bufferDays: 0,
+        minSessionLength: 15,
+        bufferTimeBetweenSessions: 0,
+        studyWindowStartHour: 6,
+        studyWindowEndHour: 23,
+        shortBreakDuration: 5,
+        longBreakDuration: 15,
+        maxConsecutiveHours: 4,
+        avoidTimeRanges: [],
+        weekendStudyHours: 4,
+        autoCompleteSessions: false,
+        enableNotifications: true,
+        userPrefersPressure: false,
+        studyPlanMode: 'even',
+        dateSpecificStudyWindows: []
+    });
+    const [, setIsPlanStale] = useState(false);
+    const [, setLastPlanStaleReason] = useState<"settings" | "commitment" | "task" | null>(null);
+    const [hasLoadedFromStorage, setHasLoadedFromStorage] = useState(false);
+    const [hasFirstChangeOccurred, setHasFirstChangeOccurred] = useState(false);
+
+    // Add state to track last-timed session and ready-to-mark-done
+    const [lastTimedSession, setLastTimedSession] = useState<{ planDate: string; sessionNumber: number } | null>(null);
+    const [editingCommitment, setEditingCommitment] = useState<FixedCommitment | null>(null);
+
+    // Global timer state that persists across tab switches
+    const [globalTimer, setGlobalTimer] = useState<TimerState>({
+        isRunning: false,
+        currentTime: 0,
+        totalTime: 0,
+        currentTaskId: null
+    });
+
+    const [showTaskInput, setShowTaskInput] = useState(false);
+    const [notificationMessage, setNotificationMessage] = useState<string | null>(null);
+    const [autoRemovedTasks, setAutoRemovedTasks] = useState<string[]>([]);
+    const [showSuggestionsPanel, setShowSuggestionsPanel] = useState(false);
+
+    // Onboarding tutorial state
+    const [showInteractiveTutorial, setShowInteractiveTutorial] = useState(false);
+    const [highlightedTab, setHighlightedTab] = useState<string | null>(null);
+    const [highlightStudyPlanMode, setHighlightStudyPlanMode] = useState(false);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [showHelpModal, setShowHelpModal] = useState(false);
+    const [showGCashModal, setShowGCashModal] = useState(false);
+
+    // Gamification state
+    const [showGamificationPanel, setShowGamificationPanel] = useState(false);
+    const [gamificationData, setGamificationData] = useState<GamificationData>({
+        achievements: ACHIEVEMENTS,
+        unlockedAchievements: [],
+        stats: {
+            totalStudyHours: 0,
+            totalTasksCompleted: 0,
+            currentStreak: 0,
+            longestStreak: 0,
+            perfectWeeks: 0,
+            earlyFinishes: 0,
+            totalSessions: 0,
+            averageSessionLength: 0,
+            favoriteStudyTime: 'morning' as const,
+            efficiencyScore: 100,
+            level: 1,
+            totalPoints: 0,
+            joinedDate: new Date().toISOString(),
+            lastActiveDate: new Date().toISOString()
+        },
+        streak: {
+            current: 0,
+            longest: 0,
+            lastStudyDate: '',
+            streakDates: []
+        },
+        milestones: [],
+        level: calculateLevel(0),
+        recentUnlocks: []
+    });
+    const [achievementNotification, setAchievementNotification] = useState<Achievement | null>(null);
+    const [motivationalToast, setMotivationalToast] = useState<{
+        message: string;
+        icon: string;
+        type: 'encouragement' | 'celebration' | 'tip' | 'reminder';
+    } | null>(null);
+
+    // Dark mode state
+    const [darkMode, setDarkMode] = useState(false);
+
     // Load data from localStorage after component mounts
     useEffect(() => {
         try {
@@ -125,105 +222,6 @@ function App() {
             setHasLoadedFromStorage(true);
         }
     }, []);
-
-    const [activeTab, setActiveTab] = useState<'dashboard' | 'tasks' | 'plan' | 'timer' | 'calendar' | 'commitments' | 'settings'>('dashboard');
-    const [tasks, setTasks] = useState<Task[]>([]);
-    const [studyPlans, setStudyPlans] = useState<StudyPlan[]>([]);
-    const [currentTask, setCurrentTask] = useState<Task | null>(null);
-    const [currentSession, setCurrentSession] = useState<{ allocatedHours: number; planDate?: string; sessionNumber?: number } | null>(null);
-    const [fixedCommitments, setFixedCommitments] = useState<FixedCommitment[]>([]);
-    const [settings, setSettings] = useState<UserSettings>({
-        dailyAvailableHours: 6,
-        workDays: [0, 1, 2, 3, 4, 5, 6],
-        bufferDays: 0,
-        minSessionLength: 15,
-        bufferTimeBetweenSessions: 0,
-        studyWindowStartHour: 6,
-        studyWindowEndHour: 23,
-        shortBreakDuration: 5,
-        longBreakDuration: 15,
-        maxConsecutiveHours: 4,
-        avoidTimeRanges: [],
-        weekendStudyHours: 4,
-        autoCompleteSessions: false,
-        enableNotifications: true,
-        userPrefersPressure: false,
-        studyPlanMode: 'even',
-        dateSpecificStudyWindows: []
-    });
-    const [, setIsPlanStale] = useState(false);
-    const [, setLastPlanStaleReason] = useState<"settings" | "commitment" | "task" | null>(null);
-    const [hasLoadedFromStorage, setHasLoadedFromStorage] = useState(false);
-    const [hasFirstChangeOccurred, setHasFirstChangeOccurred] = useState(false);
-
-
-    // Add state to track last-timed session and ready-to-mark-done
-    const [lastTimedSession, setLastTimedSession] = useState<{ planDate: string; sessionNumber: number } | null>(null);
-    const [editingCommitment, setEditingCommitment] = useState<FixedCommitment | null>(null);
-    
-    // Global timer state that persists across tab switches
-    const [globalTimer, setGlobalTimer] = useState<TimerState>({
-        isRunning: false,
-        currentTime: 0,
-        totalTime: 0,
-        currentTaskId: null
-    });
-
-    // Dark mode state management
-
-    const [showTaskInput, setShowTaskInput] = useState(false);
-    const [notificationMessage, setNotificationMessage] = useState<string | null>(null);
-    const [autoRemovedTasks, setAutoRemovedTasks] = useState<string[]>([]);
-    const [showSuggestionsPanel, setShowSuggestionsPanel] = useState(false);
-
-    // Onboarding tutorial state
-    const [showInteractiveTutorial, setShowInteractiveTutorial] = useState(false);
-    const [highlightedTab, setHighlightedTab] = useState<string | null>(null);
-    const [highlightStudyPlanMode, setHighlightStudyPlanMode] = useState(false);
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const [showHelpModal, setShowHelpModal] = useState(false);
-    const [showGCashModal, setShowGCashModal] = useState(false);
-
-    // Gamification state
-    const [showGamificationPanel, setShowGamificationPanel] = useState(false);
-    const [gamificationData, setGamificationData] = useState<GamificationData>({
-        achievements: ACHIEVEMENTS,
-        unlockedAchievements: [],
-        stats: {
-            totalStudyHours: 0,
-            totalTasksCompleted: 0,
-            currentStreak: 0,
-            longestStreak: 0,
-            perfectWeeks: 0,
-            earlyFinishes: 0,
-            totalSessions: 0,
-            averageSessionLength: 0,
-            favoriteStudyTime: 'morning' as const,
-            efficiencyScore: 100,
-            level: 1,
-            totalPoints: 0,
-            joinedDate: new Date().toISOString(),
-            lastActiveDate: new Date().toISOString()
-        },
-        streak: {
-            current: 0,
-            longest: 0,
-            lastStudyDate: '',
-            streakDates: []
-        },
-        milestones: [],
-        level: calculateLevel(0),
-        recentUnlocks: []
-    });
-    const [achievementNotification, setAchievementNotification] = useState<Achievement | null>(null);
-    const [motivationalToast, setMotivationalToast] = useState<{
-        message: string;
-        icon: string;
-        type: 'encouragement' | 'celebration' | 'tip' | 'reminder';
-    } | null>(null);
-
-    // Dark mode state
-    const [darkMode, setDarkMode] = useState(false);
 
     // Persist gamification data
     useEffect(() => {

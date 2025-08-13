@@ -438,7 +438,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({
   const taskCategories = Array.from(new Set(tasks.map(t => t.category).filter((v): v is string => !!v)));
   
   // Define all default categories with their colors
-  const defaultCategories = ['Academics', 'Personal', 'Learning', 'Home', 'Finance', 'Organization', 'Work', 'Health'];
+  const defaultCategories = ['Academics', 'Personal', 'Learning', 'Home', 'Finance', 'Organization', 'Work', 'Health', 'Routine'];
   
   // Assign color to each category with specific defaults
   const categoryColorMap: Record<string, string> = {};
@@ -474,6 +474,9 @@ const CalendarView: React.FC<CalendarViewProps> = ({
           break;
         case 'health':
           categoryColorMap[category] = '#ef4444'; // Red
+          break;
+        case 'routine':
+          categoryColorMap[category] = '#6366f1'; // Indigo
           break;
         default:
           categoryColorMap[category] = '#64748b'; // Default gray
@@ -929,7 +932,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({
         } else if (categoryLower.includes('work') || categoryLower.includes('job') || categoryLower.includes('business')) {
           return '💼';
         } else if (categoryLower.includes('health') || categoryLower.includes('medical') || categoryLower.includes('fitness')) {
-          return '🏥';
+          return '��';
         } else if (categoryLower.includes('finance') || categoryLower.includes('money') || categoryLower.includes('budget')) {
           return '💰';
         } else if (categoryLower.includes('home') || categoryLower.includes('house') || categoryLower.includes('family')) {
@@ -1132,7 +1135,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({
         </div>
         ))}
         {/* Default Category Legends (for categories not yet used) */}
-        {['Academics', 'Personal', 'Learning', 'Home', 'Finance', 'Organization', 'Work', 'Health'].filter(category => !taskCategories.includes(category)).map(category => {
+        {['Academics', 'Personal', 'Learning', 'Home', 'Finance', 'Organization', 'Work', 'Health', 'Routine'].filter(category => !taskCategories.includes(category)).map(category => {
           let color = '#64748b'; // Default gray
           switch (category.toLowerCase()) {
             case 'academics':
@@ -1158,6 +1161,9 @@ const CalendarView: React.FC<CalendarViewProps> = ({
               break;
             case 'health':
               color = '#ef4444'; // Red
+              break;
+            case 'routine':
+              color = '#6366f1'; // Indigo
               break;
           }
           return (
@@ -1451,7 +1457,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({
                   <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Task Category Colors</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* All default categories */}
-                    {['Academics', 'Personal', 'Learning', 'Home', 'Finance', 'Organization', 'Work', 'Health'].map(category => {
+                    {['Academics', 'Personal', 'Learning', 'Home', 'Finance', 'Organization', 'Work', 'Health', 'Routine'].map(category => {
                       let defaultColor = '#64748b';
                       switch (category.toLowerCase()) {
                         case 'academics':
@@ -1477,6 +1483,9 @@ const CalendarView: React.FC<CalendarViewProps> = ({
                           break;
                         case 'health':
                           defaultColor = '#ef4444'; // Red
+                          break;
+                        case 'routine':
+                          defaultColor = '#6366f1'; // Indigo
                           break;
                       }
                       return (

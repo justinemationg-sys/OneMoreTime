@@ -199,18 +199,30 @@ const TaskInputSimplified: React.FC<TaskInputProps> = ({ onAddTask, onCancel, us
     }
 
     const deadlineDate = formData.deadline;
+
+    // Get existing sessions for the deadline date
+    const existingSessions = existingStudyPlans
+      .find(plan => plan.date === deadlineDate)
+      ?.plannedTasks || [];
+
+    // Get the effective study window for the deadline date
+    const effectiveWindow = getEffectiveStudyWindow(deadlineDate, userSettings);
+
     const timeSlot = findNextAvailableTimeSlot(
-      deadlineDate,
       estimatedDecimalHours,
-      userSettings,
+      existingSessions,
       fixedCommitments,
-      existingStudyPlans
+      effectiveWindow.startHour,
+      effectiveWindow.endHour,
+      userSettings.bufferTimeBetweenSessions || 0,
+      deadlineDate,
+      userSettings
     );
 
-    if (!timeSlot.found) {
+    if (!timeSlot) {
       return {
         hasSlot: false,
-        message: timeSlot.reason || 'No available time slot found for this one-sitting task on the deadline date.'
+        message: 'No available time slot found for this one-sitting task on the deadline date.'
       };
     }
 
@@ -379,7 +391,7 @@ const TaskInputSimplified: React.FC<TaskInputProps> = ({ onAddTask, onCancel, us
               className="w-full border border-white/30 dark:border-white/20 rounded-xl px-3 py-2 text-sm bg-white/70 dark:bg-black/20 dark:text-white focus:ring-2 focus:ring-violet-500 focus:border-transparent"
             >
               <option value="">Select category...</option>
-              {['Academics', 'Organization', 'Work', 'Personal', 'Health', 'Learning', 'Finance', 'Home', 'Custom...'].map(opt => (
+              {['Academics', 'Organization', 'Work', 'Personal', 'Health', 'Learning', 'Finance', 'Home', 'Routine', 'Custom...'].map(opt => (
                 <option key={opt} value={opt}>{opt}</option>
               ))}
             </select>
@@ -518,7 +530,7 @@ const TaskInputSimplified: React.FC<TaskInputProps> = ({ onAddTask, onCancel, us
                   {isOneSittingTooLong && (
                     <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-lg">
                       <div className="flex items-start gap-2">
-                        <span className="text-red-500 text-sm">❌</span>
+                        <span className="text-red-500 text-sm">���</span>
                         <div className="text-xs text-red-700 dark:text-red-200">
                           <div className="font-medium mb-1">Task Duration Too Long</div>
                           <div>This one-sitting task requires {estimatedDecimalHours}h but you only have {userSettings.dailyAvailableHours}h available per day.</div>
