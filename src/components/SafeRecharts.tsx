@@ -21,17 +21,32 @@ export const SafePieChart: React.FC<SafePieChartProps> = ({
   tooltipFormatter
 }) => {
   const [isClient, setIsClient] = useState(false);
+  const [hasError, setHasError] = useState(false);
+  const mountedRef = useRef(false);
 
   useEffect(() => {
-    // Ensure we're on the client side before rendering Recharts
-    setIsClient(true);
+    // Mark component as mounted and safe to render charts
+    mountedRef.current = true;
+    // Small delay to ensure DOM is fully ready
+    const timer = setTimeout(() => {
+      if (mountedRef.current) {
+        setIsClient(true);
+      }
+    }, 50);
+
+    return () => {
+      mountedRef.current = false;
+      clearTimeout(timer);
+    };
   }, []);
 
   // Don't render on server side or during initial hydration
-  if (!isClient) {
+  if (!isClient || hasError) {
     return (
       <div className="w-32 h-32 flex items-center justify-center bg-gray-100 dark:bg-gray-700 rounded-full">
-        <div className="text-sm text-gray-500 dark:text-gray-400">Loading...</div>
+        <div className="text-sm text-gray-500 dark:text-gray-400">
+          {hasError ? 'Chart Error' : 'Loading...'}
+        </div>
       </div>
     );
   }
