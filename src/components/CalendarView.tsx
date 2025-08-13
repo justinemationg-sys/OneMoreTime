@@ -438,7 +438,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({
   const taskCategories = Array.from(new Set(tasks.map(t => t.category).filter((v): v is string => !!v)));
   
   // Define all default categories with their colors
-  const defaultCategories = ['Academics', 'Personal', 'Learning', 'Home', 'Finance', 'Organization', 'Work', 'Health'];
+  const defaultCategories = ['Academics', 'Personal', 'Learning', 'Home', 'Finance', 'Organization', 'Work', 'Health', 'Routine'];
   
   // Assign color to each category with specific defaults
   const categoryColorMap: Record<string, string> = {};
