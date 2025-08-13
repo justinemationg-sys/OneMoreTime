@@ -180,6 +180,7 @@ const FixedCommitmentEdit: React.FC<FixedCommitmentEditProps> = ({ commitment, e
                 <option value="Finance">Finance</option>
                 <option value="Home">Home</option>
                 <option value="Organization">Organization</option>
+                <option value="Routine">Routine</option>
                 <option value="Buffer">Buffer</option>
               </select>
             </div>
