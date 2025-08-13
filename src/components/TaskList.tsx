@@ -1024,20 +1024,49 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, onUpdateTask, onDeleteTask, 
       {/* Completed Tasks */}
       {completedTasks.length > 0 && (
         <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-            <CheckCircle2 className="text-green-600 dark:text-green-400" size={20} />
-              <h2 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-white">Completed Tasks</h2>
-              <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full dark:bg-green-900 dark:text-green-200">
-                {completedTasks.length}
-              </span>
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <CheckCircle2 className="text-green-600 dark:text-green-400" size={20} />
+                <h2 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-white">Completed Tasks</h2>
+                <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full dark:bg-green-900 dark:text-green-200">
+                  {completedTasks.length}
+                </span>
+              </div>
+              <button
+                onClick={() => setShowCompletedTasks(!showCompletedTasks)}
+                className="text-sm text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
+              >
+                {showCompletedTasks ? 'Hide' : 'Show'} Completed
+              </button>
             </div>
-            <button
-              onClick={() => setShowCompletedTasks(!showCompletedTasks)}
-              className="text-sm text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
-            >
-              {showCompletedTasks ? 'Hide' : 'Show'} Completed
-            </button>
+
+            {/* Sorting Controls for Completed Tasks */}
+            {showCompletedTasks && completedTasks.length > 0 && (
+              <div className="flex items-center space-x-2 ml-7">
+                <span className="text-sm text-gray-600 dark:text-gray-400">Sort by:</span>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as 'deadline' | 'startDate' | 'createdAt')}
+                  className="text-sm border border-gray-300 rounded-lg px-2 py-1 bg-white dark:bg-gray-800 dark:text-white dark:border-gray-600"
+                >
+                  <option value="deadline">Deadline</option>
+                  <option value="startDate">Start Date</option>
+                  <option value="createdAt">Date Created</option>
+                </select>
+                <button
+                  onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+                  className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                  title={`Sort ${sortOrder === 'asc' ? 'descending' : 'ascending'}`}
+                >
+                  {sortOrder === 'asc' ? (
+                    <ArrowUp size={16} className="text-gray-600 dark:text-gray-400" />
+                  ) : (
+                    <ArrowDown size={16} className="text-gray-600 dark:text-gray-400" />
+                  )}
+                </button>
+              </div>
+            )}
           </div>
 
           {showCompletedTasks && (
