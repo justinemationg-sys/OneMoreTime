@@ -454,54 +454,52 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, onUpdateTask, onDeleteTask, 
               >
               {editingTaskId === task.id ? (
                   <div className="space-y-4">
-                    {/* Task Title & Category Row */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-1">Task Title <span className="text-red-500">*</span></label>
-                        <input
-                          type="text"
-                          required
-                          value={editFormData.title || ''}
-                          onChange={(e) => setEditFormData({ ...editFormData, title: e.target.value })}
-                          className="w-full px-4 py-3 backdrop-blur-sm bg-white/70 dark:bg-black/20 border border-white/30 dark:border-white/20 rounded-xl text-base focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:text-white transition-all duration-300"
-                          placeholder="e.g., Write project report"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Category <span className="text-gray-400">(Optional)</span></label>
-                        <select
-                          value={editFormData.category || ''}
-                          onChange={(e) => setEditFormData({ ...editFormData, category: e.target.value, customCategory: '' })}
-                          className="w-full border rounded-lg px-3 py-2 text-base bg-white dark:bg-gray-800 dark:text-white"
-                        >
-                          <option value="">Select category...</option>
-                          {['Academics', 'Organization', 'Work', 'Personal', 'Health', 'Learning', 'Finance', 'Home', 'Custom...'].map(opt => (
-                            <option key={opt} value={opt}>{opt}</option>
-                          ))}
-                        </select>
-                        {editFormData.category === 'Custom...' && (
-                          <input
-                            type="text"
-                            value={editFormData.customCategory || ''}
-                            onChange={(e) => setEditFormData({ ...editFormData, customCategory: e.target.value })}
-                            className="w-full border rounded-lg px-3 py-2 mt-2 text-base bg-white dark:bg-gray-800 dark:text-white"
-                            placeholder="Enter custom category"
-                          />
-                        )}
-                      </div>
+                    {/* 1. Task Title */}
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-1">Task Title <span className="text-red-500">*</span></label>
+                      <input
+                        type="text"
+                        required
+                        value={editFormData.title || ''}
+                        onChange={(e) => setEditFormData({ ...editFormData, title: e.target.value })}
+                        className="w-full px-4 py-3 backdrop-blur-sm bg-white/70 dark:bg-black/20 border border-white/30 dark:border-white/20 rounded-xl text-base focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:text-white transition-all duration-300"
+                        placeholder="e.g., Write project report"
+                      />
                     </div>
 
-                    {/* Description */}
+                    {/* 2. Description */}
                     <div>
-
-                      <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-1">Description <span className="text-gray-400">(Optional)</span></label>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Description <span className="text-gray-400">(Optional)</span></label>
                       <textarea
                         value={editFormData.description || ''}
                         onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
                         className="w-full px-3 py-2 border rounded-lg text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none h-20 border-gray-300 bg-white dark:bg-gray-800 dark:text-white"
                         placeholder="Describe the task..."
                       />
+                    </div>
+
+                    {/* 3. Category */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Category <span className="text-gray-400">(Optional)</span></label>
+                      <select
+                        value={editFormData.category || ''}
+                        onChange={(e) => setEditFormData({ ...editFormData, category: e.target.value, customCategory: '' })}
+                        className="w-full border rounded-lg px-3 py-2 text-base bg-white dark:bg-gray-800 dark:text-white"
+                      >
+                        <option value="">Select category...</option>
+                        {['Academics', 'Organization', 'Work', 'Personal', 'Health', 'Learning', 'Finance', 'Home', 'Custom...'].map(opt => (
+                          <option key={opt} value={opt}>{opt}</option>
+                        ))}
+                      </select>
+                      {editFormData.category === 'Custom...' && (
+                        <input
+                          type="text"
+                          value={editFormData.customCategory || ''}
+                          onChange={(e) => setEditFormData({ ...editFormData, customCategory: e.target.value })}
+                          className="w-full border rounded-lg px-3 py-2 mt-2 text-base bg-white dark:bg-gray-800 dark:text-white"
+                          placeholder="Enter custom category"
+                        />
+                      )}
                     </div>
 
                     {/* Time Estimation - Dual Mode Interface */}
