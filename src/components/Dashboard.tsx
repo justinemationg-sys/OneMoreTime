@@ -3,7 +3,6 @@ import { Clock, BookOpen, TrendingUp, Calendar, Bell, CheckCircle2, AlertTriangl
 import { Task, StudyPlan } from '../types';
 import { formatTime, getLocalDateString, checkSessionStatus } from '../utils/scheduling';
 import { SafePieChart } from './SafeRecharts';
-import { formatTime } from '../utils/scheduling';
 
 interface DashboardProps {
   tasks: Task[];
@@ -600,7 +599,7 @@ const Dashboard: React.FC<DashboardProps> = ({ tasks, studyPlans, dailyAvailable
                 <span>Today's Sessions</span>
               </h2>
               <div className="text-center py-8">
-                <div className="text-4xl mb-4">��</div>
+                <div className="text-4xl mb-4">📚</div>
                 <h3 className="text-xl font-semibold text-gray-800 mb-2 dark:text-white">No Sessions Planned</h3>
                 <p className="text-gray-600 dark:text-gray-300">
                   You have no study sessions planned for today. Time to generate a study plan! ����
