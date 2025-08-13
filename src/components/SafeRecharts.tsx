@@ -69,11 +69,11 @@ export const SafePieChart: React.FC<SafePieChartProps> = ({
                 <Cell key={`cell-${index}`} fill={entry.color} />
               ))}
             </Pie>
-            <Tooltip 
+            <Tooltip
               formatter={tooltipFormatter || ((value, name) => [value, name])}
-              contentStyle={{ 
-                backgroundColor: '#1f2937', 
-                border: 'none', 
+              contentStyle={{
+                backgroundColor: '#1f2937',
+                border: 'none',
                 borderRadius: '8px',
                 color: '#f9fafb'
               }}
@@ -94,6 +94,8 @@ export const SafePieChart: React.FC<SafePieChartProps> = ({
     );
   } catch (error) {
     console.error('Error rendering chart:', error);
+    // Set error state to prevent re-rendering attempts
+    setHasError(true);
     return (
       <div className="w-32 h-32 flex items-center justify-center bg-gray-100 dark:bg-gray-700 rounded-full">
         <div className="text-xs text-gray-500 dark:text-gray-400 text-center">
