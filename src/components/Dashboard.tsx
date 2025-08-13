@@ -299,19 +299,21 @@ const Dashboard: React.FC<DashboardProps> = ({ tasks, studyPlans, dailyAvailable
             {/* Task Completion Circle Chart */}
             <div className="flex flex-col items-center">
               <h3 className="text-lg font-medium text-gray-700 mb-4 dark:text-gray-300">Task Completion</h3>
-              <SafePieChart
-                data={[
-                  { name: 'Completed', value: completedTasks.length, color: '#10b981' },
-                  { name: 'Pending', value: tasks.length - completedTasks.length, color: '#e5e7eb' }
-                ]}
-                centerContent={
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-gray-800 dark:text-white">
-                      {tasks.length > 0 ? Math.round((completedTasks.length / tasks.length) * 100) : 0}%
+              <ChartErrorBoundary>
+                <SafePieChart
+                  data={[
+                    { name: 'Completed', value: completedTasks.length, color: '#10b981' },
+                    { name: 'Pending', value: tasks.length - completedTasks.length, color: '#e5e7eb' }
+                  ]}
+                  centerContent={
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-gray-800 dark:text-white">
+                        {tasks.length > 0 ? Math.round((completedTasks.length / tasks.length) * 100) : 0}%
+                      </div>
                     </div>
-                  </div>
-                }
-              />
+                  }
+                />
+              </ChartErrorBoundary>
               <div className="mt-2 text-center">
                 <div className="text-sm text-gray-600 dark:text-gray-400">
                   {completedTasks.length}/{tasks.length}
