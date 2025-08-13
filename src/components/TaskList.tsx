@@ -38,6 +38,10 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, onUpdateTask, onDeleteTask, 
   const [showHelpModal, setShowHelpModal] = useState(false);
   const [showTimeEstimationModal, setShowTimeEstimationModal] = useState(false);
 
+  // Sorting state
+  const [sortBy, setSortBy] = useState<'deadline' | 'startDate' | 'createdAt'>('deadline');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+
   // Auto-detect deadline type based on whether deadline is set (similar to TaskInput)
   React.useEffect(() => {
     if (editingTaskId) {
