@@ -378,76 +378,76 @@ const TaskInputSimplified: React.FC<TaskInputProps> = ({ onAddTask, onCancel, us
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Task Title & Description - Compact Layout */}
-          <div className="space-y-3">
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-1">
-                Task Title <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                required
-                value={formData.title}
-                onChange={e => setFormData(f => ({ ...f, title: e.target.value }))}
-                className="w-full px-4 py-3 backdrop-blur-sm bg-white/70 dark:bg-black/20 border border-white/30 dark:border-white/20 rounded-xl text-base focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:text-white transition-all duration-300"
-                placeholder="e.g., Write project report"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
-                Description <span className="text-gray-400">(Optional)</span>
-              </label>
-              <textarea
-                value={formData.description}
-                onChange={e => setFormData(f => ({ ...f, description: e.target.value }))}
-                className="w-full px-3 py-2 backdrop-blur-sm bg-white/70 dark:bg-black/20 border border-white/30 dark:border-white/20 rounded-xl text-sm focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:text-white transition-all duration-300 resize-none"
-                placeholder="Add any additional details..."
-                rows={2}
-              />
-            </div>
+          {/* 1. Task Title */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-1">
+              Task Title <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              required
+              value={formData.title}
+              onChange={e => setFormData(f => ({ ...f, title: e.target.value }))}
+              className="w-full px-4 py-3 backdrop-blur-sm bg-white/70 dark:bg-black/20 border border-white/30 dark:border-white/20 rounded-xl text-base focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:text-white transition-all duration-300"
+              placeholder="e.g., Write project report"
+            />
           </div>
 
-          {/* Category, Deadline & Start Date - Optimized Layout */}
-          <div className="space-y-3">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
-                Category
-              </label>
-              <select
-                value={formData.category}
-                onChange={e => setFormData(f => ({ ...f, category: e.target.value, customCategory: '' }))}
-                className="w-full border border-white/30 dark:border-white/20 rounded-xl px-3 py-2 text-sm bg-white/70 dark:bg-black/20 dark:text-white focus:ring-2 focus:ring-violet-500 focus:border-transparent"
-              >
-                <option value="">Select category...</option>
-                {['Academics', 'Organization', 'Work', 'Personal', 'Health', 'Learning', 'Finance', 'Home', 'Custom...'].map(opt => (
-                  <option key={opt} value={opt}>{opt}</option>
-                ))}
-              </select>
-              {showCustomCategory && (
-                <div className="relative mt-1">
-                  <input
-                    type="text"
-                    value={formData.customCategory}
-                    onChange={e => setFormData(f => ({ ...f, customCategory: e.target.value }))}
-                    className="w-full border border-white/30 dark:border-white/20 rounded-xl px-3 py-2 pr-9 text-sm bg-white/70 dark:bg-black/20 dark:text-white focus:ring-2 focus:ring-violet-500 focus:border-transparent"
-                    placeholder="Enter custom category"
-                  />
-                  {formData.customCategory && (
-                    <button
-                      type="button"
-                      aria-label="Clear custom category"
-                      title="Clear"
-                      className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
-                      onClick={() => setFormData(f => ({ ...f, customCategory: '' }))}
-                    >
-                      <X size={16} />
-                    </button>
-                  )}
-                </div>
-              )}
-            </div>
+          {/* 2. Description */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
+              Description <span className="text-gray-400">(Optional)</span>
+            </label>
+            <textarea
+              value={formData.description}
+              onChange={e => setFormData(f => ({ ...f, description: e.target.value }))}
+              className="w-full px-3 py-2 backdrop-blur-sm bg-white/70 dark:bg-black/20 border border-white/30 dark:border-white/20 rounded-xl text-sm focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:text-white transition-all duration-300 resize-none"
+              placeholder="Add any additional details..."
+              rows={2}
+            />
+          </div>
 
-            {/* Deadline and Start Date - Side by Side */}
+          {/* 3. Category */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
+              Category
+            </label>
+            <select
+              value={formData.category}
+              onChange={e => setFormData(f => ({ ...f, category: e.target.value, customCategory: '' }))}
+              className="w-full border border-white/30 dark:border-white/20 rounded-xl px-3 py-2 text-sm bg-white/70 dark:bg-black/20 dark:text-white focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+            >
+              <option value="">Select category...</option>
+              {['Academics', 'Organization', 'Work', 'Personal', 'Health', 'Learning', 'Finance', 'Home', 'Custom...'].map(opt => (
+                <option key={opt} value={opt}>{opt}</option>
+              ))}
+            </select>
+            {showCustomCategory && (
+              <div className="relative mt-1">
+                <input
+                  type="text"
+                  value={formData.customCategory}
+                  onChange={e => setFormData(f => ({ ...f, customCategory: e.target.value }))}
+                  className="w-full border border-white/30 dark:border-white/20 rounded-xl px-3 py-2 pr-9 text-sm bg-white/70 dark:bg-black/20 dark:text-white focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+                  placeholder="Enter custom category"
+                />
+                {formData.customCategory && (
+                  <button
+                    type="button"
+                    aria-label="Clear custom category"
+                    title="Clear"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                    onClick={() => setFormData(f => ({ ...f, customCategory: '' }))}
+                  >
+                    <X size={16} />
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* 4. Deadline (with Start Date to the right) */}
+          <div className="space-y-3">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
@@ -489,7 +489,7 @@ const TaskInputSimplified: React.FC<TaskInputProps> = ({ onAddTask, onCancel, us
               )}
             </div>
 
-            {/* Quick deadline shortcuts - more compact */}
+            {/* Quick deadline shortcuts */}
             <div className="flex flex-wrap gap-1 text-xs">
               <button
                 type="button"
@@ -532,7 +532,112 @@ const TaskInputSimplified: React.FC<TaskInputProps> = ({ onAddTask, onCancel, us
             </div>
           </div>
 
-          {/* Time Estimation - Dual Mode Interface */}
+          {/* 5. One sitting toggle */}
+          <div>
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={formData.isOneTimeTask}
+                onChange={e => setFormData(f => ({ ...f, isOneTimeTask: e.target.checked }))}
+                className="text-violet-600 rounded focus:ring-violet-500"
+              />
+              <span className="text-sm text-gray-700 dark:text-gray-200">
+                Complete this task in one sitting (don't divide into sessions)
+              </span>
+            </label>
+            {formData.isOneTimeTask && (
+                <div className="mt-1 space-y-2">
+                  <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded border-l-2 border-blue-300 dark:border-blue-600">
+                    <p className="text-xs text-blue-700 dark:text-blue-300">
+                       One-sitting tasks require a deadline and will be scheduled as single blocks on the deadline day, regardless of importance level.
+                    </p>
+                  </div>
+
+                  {/* One-sitting task warnings */}
+                  {isOneSittingTooLong && (
+                    <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-lg">
+                      <div className="flex items-start gap-2">
+                        <span className="text-red-500 text-sm">❌</span>
+                        <div className="text-xs text-red-700 dark:text-red-200">
+                          <div className="font-medium mb-1">Task Duration Too Long</div>
+                          <div>This one-sitting task requires {estimatedDecimalHours}h but you only have {userSettings.dailyAvailableHours}h available per day.</div>
+                          <div className="mt-2 font-medium">Solutions:</div>
+                          <div className="ml-2">
+                            • Reduce the estimated time<br/>
+                            • Increase daily available hours in settings<br/>
+                            • Uncheck "one-sitting" to allow splitting into sessions
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {isOneSittingNoTimeSlot && (
+                    <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-lg">
+                      <div className="flex items-start gap-2">
+                        <span className="text-red-500 text-sm">📅</span>
+                        <div className="text-xs text-red-700 dark:text-red-200">
+                          <div className="font-medium mb-1">No Available Time Slot</div>
+                          <div>{oneSittingTimeSlotCheck.message}</div>
+                          <div className="mt-2 font-medium">Solutions:</div>
+                          <div className="ml-2">
+                            • Choose a different deadline date<br/>
+                            • Reduce the estimated time<br/>
+                            • Move or remove conflicting commitments<br/>
+                            • Uncheck "one-sitting" to allow flexible scheduling
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+          </div>
+
+          {/* 6. Frequency */}
+          {!formData.isOneTimeTask && (
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">
+                How often would you like to work on this?
+              </label>
+              <select
+                value={formData.targetFrequency}
+                onChange={e => setFormData(f => ({ ...f, targetFrequency: e.target.value as any }))}
+                className="w-full px-4 py-3 border border-white/30 dark:border-white/20 rounded-xl text-sm bg-white/70 dark:bg-black/20 dark:text-white focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+              >
+                <option value="daily">🗓️ Daily progress - Work a bit each day</option>
+                <option
+                  value="3x-week"
+                  disabled={frequencyRestrictions.disable3xWeek}
+                >
+                  📅 Few times per week - Every 2-3 days{frequencyRestrictions.disable3xWeek ? ' (Need 1+ week)' : ''}
+                </option>
+                <option
+                  value="weekly"
+                  disabled={frequencyRestrictions.disableWeekly}
+                >
+                  📆 Weekly sessions - Once per week{frequencyRestrictions.disableWeekly ? ' (Need 2+ weeks)' : ''}
+                </option>
+                <option value="flexible">⏰ When I have time - Flexible scheduling</option>
+              </select>
+
+              {deadlineConflict.hasConflict && (
+                <div className="mt-2 p-2 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 rounded text-xs text-amber-700 dark:text-amber-200">
+                  <div className="font-medium">Frequency preference may not allow completion before deadline</div>
+                  {deadlineConflict.reason && (
+                    <div className="mt-1">{deadlineConflict.reason}</div>
+                  )}
+                  {deadlineConflict.recommendedFrequency && (
+                    <div className="mt-1">
+                      <strong>Recommended:</strong> Switch to "{deadlineConflict.recommendedFrequency}" frequency, or daily scheduling will be used instead.
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* 7. Time Estimation - Dual Mode Interface */}
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200">
