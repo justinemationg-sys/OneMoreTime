@@ -1481,6 +1481,9 @@ const CalendarView: React.FC<CalendarViewProps> = ({
                         case 'health':
                           defaultColor = '#ef4444'; // Red
                           break;
+                        case 'routine':
+                          defaultColor = '#6366f1'; // Indigo
+                          break;
                       }
                       return (
                         <div key={category} className="flex items-center space-x-3">
