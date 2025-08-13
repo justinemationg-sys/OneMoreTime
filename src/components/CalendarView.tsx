@@ -167,6 +167,11 @@ const CalendarView: React.FC<CalendarViewProps> = ({
     localStorage.setItem('timepilot-calendar-colors', JSON.stringify(colorSettings));
   }, [colorSettings]);
 
+  // Persist category colors
+  useEffect(() => {
+    localStorage.setItem('timepilot-category-colors', JSON.stringify(categoryColors));
+  }, [categoryColors]);
+
   // Save time interval to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem('timepilot-calendar-interval', timeInterval.toString());
@@ -900,7 +905,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({
       case 'work':
         return '💼';
       case 'personal':
-        return '��';
+        return '👤';
       case 'health':
         return '🏥';
       case 'learning':
