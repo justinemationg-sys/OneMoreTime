@@ -856,67 +856,6 @@ const TaskInputSimplified: React.FC<TaskInputProps> = ({ onAddTask, onCancel, us
             )}
           </div>
 
-          {/* One-time task option */}
-          <div>
-            <label className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={formData.isOneTimeTask}
-                onChange={e => setFormData(f => ({ ...f, isOneTimeTask: e.target.checked }))}
-                className="text-violet-600 rounded focus:ring-violet-500"
-              />
-              <span className="text-sm text-gray-700 dark:text-gray-200">
-                Complete this task in one sitting (don't divide into sessions)
-              </span>
-            </label>
-            {formData.isOneTimeTask && (
-                <div className="mt-1 space-y-2">
-                  <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded border-l-2 border-blue-300 dark:border-blue-600">
-                    <p className="text-xs text-blue-700 dark:text-blue-300">
-                       One-sitting tasks require a deadline and will be scheduled as single blocks on the deadline day, regardless of importance level.
-                    </p>
-                  </div>
-
-                  {/* One-sitting task warnings */}
-                  {isOneSittingTooLong && (
-                    <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-lg">
-                      <div className="flex items-start gap-2">
-                        <span className="text-red-500 text-sm">❌</span>
-                        <div className="text-xs text-red-700 dark:text-red-200">
-                          <div className="font-medium mb-1">Task Duration Too Long</div>
-                          <div>This one-sitting task requires {estimatedDecimalHours}h but you only have {userSettings.dailyAvailableHours}h available per day.</div>
-                          <div className="mt-2 font-medium">Solutions:</div>
-                          <div className="ml-2">
-                            • Reduce the estimated time<br/>
-                            • Increase daily available hours in settings<br/>
-                            • Uncheck "one-sitting" to allow splitting into sessions
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {isOneSittingNoTimeSlot && (
-                    <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-lg">
-                      <div className="flex items-start gap-2">
-                        <span className="text-red-500 text-sm">📅</span>
-                        <div className="text-xs text-red-700 dark:text-red-200">
-                          <div className="font-medium mb-1">No Available Time Slot</div>
-                          <div>{oneSittingTimeSlotCheck.message}</div>
-                          <div className="mt-2 font-medium">Solutions:</div>
-                          <div className="ml-2">
-                            • Choose a different deadline date<br/>
-                            • Reduce the estimated time<br/>
-                            • Move or remove conflicting commitments<br/>
-                            • Uncheck "one-sitting" to allow flexible scheduling
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-          </div>
 
           {/* Task Impact - More Compact */}
           <div>
