@@ -131,20 +131,6 @@ const CalendarView: React.FC<CalendarViewProps> = ({
       uncategorizedTaskColor: DEFAULT_UNCATEGORIZED_COLOR,
     };
   });
-
-  // Category color state with persistence
-  const [categoryColors, setCategoryColors] = useState<Record<string, string>>(() => {
-    const saved = localStorage.getItem('timepilot-category-colors');
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch {
-        return {};
-      }
-    }
-    return {};
-  });
-
   const [selectedManualSession, setSelectedManualSession] = useState<FixedCommitment | null>(null);
   const [isMobile, setIsMobile] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
@@ -168,11 +154,6 @@ const CalendarView: React.FC<CalendarViewProps> = ({
     localStorage.setItem('timepilot-calendar-colors', JSON.stringify(colorSettings));
   }, [colorSettings]);
 
-  // Persist category colors
-  useEffect(() => {
-    localStorage.setItem('timepilot-category-colors', JSON.stringify(categoryColors));
-  }, [categoryColors]);
-
   // Save time interval to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem('timepilot-calendar-interval', timeInterval.toString());
@@ -193,8 +174,6 @@ const CalendarView: React.FC<CalendarViewProps> = ({
       notImportantTaskColor: DEFAULT_NOT_IMPORTANT_TASK_COLOR,
       uncategorizedTaskColor: DEFAULT_UNCATEGORIZED_COLOR,
     });
-    // Also reset category colors
-    setCategoryColors({});
   };
 
   const events: CalendarEvent[] = useMemo(() => {
@@ -444,41 +423,35 @@ const CalendarView: React.FC<CalendarViewProps> = ({
   // Assign color to each category with specific defaults
   const categoryColorMap: Record<string, string> = {};
   
-  // Initialize all default categories with their colors (saved or default)
+  // Initialize all default categories with their default colors
   defaultCategories.forEach((category) => {
-    // Check if user has a custom color for this category
-    if (categoryColors[category]) {
-      categoryColorMap[category] = categoryColors[category];
-    } else {
-      // Use default colors
-      switch (category.toLowerCase()) {
-        case 'academics':
-          categoryColorMap[category] = '#3b82f6'; // Blue
-          break;
-        case 'personal':
-          categoryColorMap[category] = '#a21caf'; // Purple
-          break;
-        case 'learning':
-          categoryColorMap[category] = '#a855f7'; // Lavender
-          break;
-        case 'home':
-          categoryColorMap[category] = '#f472b6'; // Light pink
-          break;
-        case 'finance':
-          categoryColorMap[category] = '#10b981'; // Green
-          break;
-        case 'organization':
-          categoryColorMap[category] = '#eab308'; // Yellow
-          break;
-        case 'work':
-          categoryColorMap[category] = '#f59e0b'; // Orange
-          break;
-        case 'health':
-          categoryColorMap[category] = '#ef4444'; // Red
-          break;
-        default:
-          categoryColorMap[category] = '#64748b'; // Default gray
-      }
+    switch (category.toLowerCase()) {
+      case 'academics':
+        categoryColorMap[category] = '#3b82f6'; // Blue
+        break;
+      case 'personal':
+        categoryColorMap[category] = '#a21caf'; // Purple
+        break;
+      case 'learning':
+        categoryColorMap[category] = '#a855f7'; // Lavender
+        break;
+      case 'home':
+        categoryColorMap[category] = '#f472b6'; // Light pink
+        break;
+      case 'finance':
+        categoryColorMap[category] = '#10b981'; // Green
+        break;
+      case 'organization':
+        categoryColorMap[category] = '#eab308'; // Yellow
+        break;
+      case 'work':
+        categoryColorMap[category] = '#f59e0b'; // Orange
+        break;
+      case 'health':
+        categoryColorMap[category] = '#ef4444'; // Red
+        break;
+      default:
+        categoryColorMap[category] = '#64748b'; // Default gray
     }
   });
   
@@ -1486,11 +1459,10 @@ const CalendarView: React.FC<CalendarViewProps> = ({
                             type="color"
                             value={categoryColorMap[category] || defaultColor}
                             onChange={(e) => {
-                              // Update the category colors state which will persist and trigger re-render
-                              setCategoryColors(prev => ({
-                                ...prev,
-                                [category]: e.target.value
-                              }));
+                              // Update the category color map
+                              const newColorMap = { ...categoryColorMap };
+                              newColorMap[category] = e.target.value;
+                              // Note: This would need to be persisted if you want to save custom colors
                             }}
                             className="w-12 h-8 rounded border border-gray-300 dark:border-gray-600"
                           />
