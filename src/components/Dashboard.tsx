@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { Clock, BookOpen, TrendingUp, Calendar, Bell, CheckCircle2, AlertTriangle, Clock3, X } from 'lucide-react';
 import { Task, StudyPlan } from '../types';
 import { formatTime, getLocalDateString, checkSessionStatus } from '../utils/scheduling';
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
+import { SafePieChart } from './SafeRecharts';
+import { formatTime } from '../utils/scheduling';
 
 interface DashboardProps {
   tasks: Task[];
