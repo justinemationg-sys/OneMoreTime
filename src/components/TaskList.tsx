@@ -385,12 +385,41 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, onUpdateTask, onDeleteTask, 
       
       {/* Active Tasks */}
       <div className="space-y-3">
-        <div className="flex items-center space-x-2 mb-2">
-          <BookOpen className="text-blue-600 dark:text-blue-400" size={20} />
-          <h2 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-white">Active Tasks</h2>
-          <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full dark:bg-blue-900 dark:text-blue-200">
-            {activeTasks.length}
-          </span>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
+          <div className="flex items-center space-x-2">
+            <BookOpen className="text-blue-600 dark:text-blue-400" size={20} />
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-white">Active Tasks</h2>
+            <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full dark:bg-blue-900 dark:text-blue-200">
+              {activeTasks.length}
+            </span>
+          </div>
+
+          {/* Sorting Controls */}
+          {activeTasks.length > 0 && (
+            <div className="flex items-center space-x-2">
+              <span className="text-sm text-gray-600 dark:text-gray-400">Sort by:</span>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as 'deadline' | 'startDate' | 'createdAt')}
+                className="text-sm border border-gray-300 rounded-lg px-2 py-1 bg-white dark:bg-gray-800 dark:text-white dark:border-gray-600"
+              >
+                <option value="deadline">Deadline</option>
+                <option value="startDate">Start Date</option>
+                <option value="createdAt">Date Created</option>
+              </select>
+              <button
+                onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+                className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                title={`Sort ${sortOrder === 'asc' ? 'descending' : 'ascending'}`}
+              >
+                {sortOrder === 'asc' ? (
+                  <ArrowUp size={16} className="text-gray-600 dark:text-gray-400" />
+                ) : (
+                  <ArrowDown size={16} className="text-gray-600 dark:text-gray-400" />
+                )}
+              </button>
+            </div>
+          )}
         </div>
 
         {activeTasks.length === 0 ? (
