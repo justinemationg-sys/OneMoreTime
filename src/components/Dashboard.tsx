@@ -334,20 +334,22 @@ const Dashboard: React.FC<DashboardProps> = ({ tasks, studyPlans, dailyAvailable
             {/* Study Hours Progress Circle Chart */}
             <div className="flex flex-col items-center">
               <h3 className="text-lg font-medium text-gray-700 mb-4 dark:text-gray-300">Study Hours Progress</h3>
-              <SafePieChart
-                data={[
-                  { name: 'Completed', value: completedHours, color: '#8b5cf6' },
-                  { name: 'Remaining', value: Math.max(0, totalOriginalEstimatedHours - completedHours), color: '#e5e7eb' }
-                ]}
-                centerContent={
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-gray-800 dark:text-white">
-                      {totalOriginalEstimatedHours > 0 ? Math.round((completedHours / totalOriginalEstimatedHours) * 100) : 0}%
+              <ChartErrorBoundary>
+                <SafePieChart
+                  data={[
+                    { name: 'Completed', value: completedHours, color: '#8b5cf6' },
+                    { name: 'Remaining', value: Math.max(0, totalOriginalEstimatedHours - completedHours), color: '#e5e7eb' }
+                  ]}
+                  centerContent={
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-gray-800 dark:text-white">
+                        {totalOriginalEstimatedHours > 0 ? Math.round((completedHours / totalOriginalEstimatedHours) * 100) : 0}%
+                      </div>
                     </div>
-                  </div>
-                }
-                tooltipFormatter={(value, name) => [typeof value === 'number' ? formatTime(value) : value, name]}
-              />
+                  }
+                  tooltipFormatter={(value, name) => [typeof value === 'number' ? formatTime(value) : value, name]}
+                />
+              </ChartErrorBoundary>
               <div className="mt-2 text-center">
                 <div className="text-sm text-gray-600 dark:text-gray-400">
                   {(() => {
