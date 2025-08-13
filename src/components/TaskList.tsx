@@ -1050,7 +1050,8 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, onUpdateTask, onDeleteTask, 
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value as 'deadline' | 'startDate' | 'createdAt')}
-                  className="text-sm border border-gray-300 rounded-lg px-2 py-1 bg-white dark:bg-gray-800 dark:text-white dark:border-gray-600"
+                  className="text-sm border border-gray-300 rounded-lg px-2 py-1 bg-white dark:bg-gray-800 dark:text-white dark:border-gray-600 focus:ring-2 focus:ring-blue-500"
+                  title="Choose how to sort completed tasks"
                 >
                   <option value="deadline">Deadline</option>
                   <option value="startDate">Start Date</option>
@@ -1058,8 +1059,8 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, onUpdateTask, onDeleteTask, 
                 </select>
                 <button
                   onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-                  className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                  title={`Sort ${sortOrder === 'asc' ? 'descending' : 'ascending'}`}
+                  className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors border border-transparent hover:border-gray-300 dark:hover:border-gray-600"
+                  title={`Currently sorting ${sortOrder === 'asc' ? 'earliest to latest' : 'latest to earliest'}. Click to reverse order.`}
                 >
                   {sortOrder === 'asc' ? (
                     <ArrowUp size={16} className="text-gray-600 dark:text-gray-400" />
