@@ -192,6 +192,8 @@ const CalendarView: React.FC<CalendarViewProps> = ({
       notImportantTaskColor: DEFAULT_NOT_IMPORTANT_TASK_COLOR,
       uncategorizedTaskColor: DEFAULT_UNCATEGORIZED_COLOR,
     });
+    // Also reset category colors
+    setCategoryColors({});
   };
 
   const events: CalendarEvent[] = useMemo(() => {
