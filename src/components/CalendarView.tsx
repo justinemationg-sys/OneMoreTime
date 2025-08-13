@@ -131,6 +131,19 @@ const CalendarView: React.FC<CalendarViewProps> = ({
       uncategorizedTaskColor: DEFAULT_UNCATEGORIZED_COLOR,
     };
   });
+  // Category color state with persistence
+  const [categoryColors, setCategoryColors] = useState<Record<string, string>>(() => {
+    const saved = localStorage.getItem('timepilot-category-colors');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch {
+        return {};
+      }
+    }
+    return {};
+  });
+
   const [selectedManualSession, setSelectedManualSession] = useState<FixedCommitment | null>(null);
   const [isMobile, setIsMobile] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
@@ -887,7 +900,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({
       case 'work':
         return '💼';
       case 'personal':
-        return '👤';
+        return '��';
       case 'health':
         return '🏥';
       case 'learning':
