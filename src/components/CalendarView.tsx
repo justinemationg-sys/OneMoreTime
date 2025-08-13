@@ -442,35 +442,41 @@ const CalendarView: React.FC<CalendarViewProps> = ({
   // Assign color to each category with specific defaults
   const categoryColorMap: Record<string, string> = {};
   
-  // Initialize all default categories with their default colors
+  // Initialize all default categories with their colors (saved or default)
   defaultCategories.forEach((category) => {
-    switch (category.toLowerCase()) {
-      case 'academics':
-        categoryColorMap[category] = '#3b82f6'; // Blue
-        break;
-      case 'personal':
-        categoryColorMap[category] = '#a21caf'; // Purple
-        break;
-      case 'learning':
-        categoryColorMap[category] = '#a855f7'; // Lavender
-        break;
-      case 'home':
-        categoryColorMap[category] = '#f472b6'; // Light pink
-        break;
-      case 'finance':
-        categoryColorMap[category] = '#10b981'; // Green
-        break;
-      case 'organization':
-        categoryColorMap[category] = '#eab308'; // Yellow
-        break;
-      case 'work':
-        categoryColorMap[category] = '#f59e0b'; // Orange
-        break;
-      case 'health':
-        categoryColorMap[category] = '#ef4444'; // Red
-        break;
-      default:
-        categoryColorMap[category] = '#64748b'; // Default gray
+    // Check if user has a custom color for this category
+    if (categoryColors[category]) {
+      categoryColorMap[category] = categoryColors[category];
+    } else {
+      // Use default colors
+      switch (category.toLowerCase()) {
+        case 'academics':
+          categoryColorMap[category] = '#3b82f6'; // Blue
+          break;
+        case 'personal':
+          categoryColorMap[category] = '#a21caf'; // Purple
+          break;
+        case 'learning':
+          categoryColorMap[category] = '#a855f7'; // Lavender
+          break;
+        case 'home':
+          categoryColorMap[category] = '#f472b6'; // Light pink
+          break;
+        case 'finance':
+          categoryColorMap[category] = '#10b981'; // Green
+          break;
+        case 'organization':
+          categoryColorMap[category] = '#eab308'; // Yellow
+          break;
+        case 'work':
+          categoryColorMap[category] = '#f59e0b'; // Orange
+          break;
+        case 'health':
+          categoryColorMap[category] = '#ef4444'; // Red
+          break;
+        default:
+          categoryColorMap[category] = '#64748b'; // Default gray
+      }
     }
   });
   
